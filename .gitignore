@@ -102,4 +102,14 @@ $RECYCLE.BIN/
 *.msp
 
 # Windows shortcuts
+
 *.lnk
+obj
+bin
+*.db
+appsettings.json
+*.rdb
+settings.json
+publish
+wwwroot
+.idea
