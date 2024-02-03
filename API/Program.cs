@@ -1,5 +1,7 @@
 
+using Core.Interfaces;
 using Infrastructure.Data;
+using Infrastructure.Data.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,7 @@ builder.Services.AddDbContext<StoreContext>(opt => {
     opt.UseSqlite("Data Source=skinet.db");
 });
 
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 var app = builder.Build();
 
