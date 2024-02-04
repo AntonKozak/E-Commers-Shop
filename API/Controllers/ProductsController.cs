@@ -19,7 +19,7 @@ public class ProductsController : ControllerBase
     public ProductsController(
      IGenericRepository<Product> prodactsRepo,
      IGenericRepository<ProductBrand> productBrandRepo,
-     IGenericRepository<ProductType> productTypeRepo, 
+     IGenericRepository<ProductType> productTypeRepo,
      IMapper mapper
      )
     {
@@ -44,7 +44,7 @@ public class ProductsController : ControllerBase
     {
         // spec= x.Id, x.IncludeBrand, x.IncludeType
         var spec = new ProductsWithTypesAndBrandsSpecification(id);
-        
+
         var product = await _prodactsRepo.GetEntityWithSpec(spec);
 
         return _mapper.Map<Product, ProductToReturnDto>(product);
