@@ -1,3 +1,4 @@
+using System.Reflection;
 using Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,5 +12,15 @@ public class StoreContext: DbContext
     }
 
     public DbSet<Product> Products { get; set; }
+    public DbSet<ProductBrand> ProductBrands { get; set; }
+    public DbSet<ProductType> ProductTypes { get; set; }
+
+    // This method is used to configure the database. It is overridden here to apply configurations to the entities
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {   
+        //specify the configuration for the Product entity
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+    }
     
 }

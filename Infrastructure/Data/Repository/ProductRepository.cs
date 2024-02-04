@@ -1,8 +1,6 @@
 using Core.Interfaces;
 using Core.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Data.Repository;
 
@@ -13,14 +11,30 @@ public class ProductRepository: IProductRepository
     {
         _context = context;
     }
-    public async Task<IReadOnlyList<Product>> GetProductListAsync()
+    public async Task<IReadOnlyList<Product>> GetProductsListAsync()
     {
-        return await _context.Products.ToListAsync();
+        var products = await _context.Products
+            .Include(p => p.ProductBrand)
+            .Include(p => p.ProductType)
+            .ToListAsync();
+        return products;
     }
     public async Task<Product> GetProductByIdAsync(int id)
     {
-        var product =  await _context.Products.FindAsync(id);
-        
-        return product!;   
+        var product =  await _context.Products
+            .Include(p => p.ProductBrand)
+            .Include(p => p.ProductType)
+            .FirstOrDefaultAsync(p => p.Id == id);
+        return product;
+    }
+
+    public async Task<IReadOnlyList<ProductBrand>> GetProductBrandsAsync()
+    {
+        return await _context.ProductBrands.ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<ProductType>> GetProductTypesAsync()
+    {
+        return await _context.ProductTypes.ToListAsync();
     }
 }
