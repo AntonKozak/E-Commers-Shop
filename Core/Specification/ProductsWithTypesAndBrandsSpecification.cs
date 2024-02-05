@@ -8,8 +8,9 @@ public class ProductsWithTypesAndBrandsSpecification : BaseSpecification<Product
     // Sorting by "priceAsc", "priceDesc"
     //filtering by brandId and / or typeId
     public ProductsWithTypesAndBrandsSpecification(ProductSpecParams productParams) : base(x => 
-        (!productParams.BrandId.HasValue || x.ProductBrandId == productParams.BrandId) &&
-        (!productParams.TypeId.HasValue || x.ProductTypeId == productParams.TypeId)
+    (string.IsNullOrEmpty(productParams.Search) || x.Name.ToLower().Contains(productParams.Search)) && // Search by name
+        (!productParams.BrandId.HasValue || x.ProductBrandId == productParams.BrandId) && // Search by brandId
+        (!productParams.TypeId.HasValue || x.ProductTypeId == productParams.TypeId) // Search by typeId
     )
     {
         AddInclude(x => x.ProductType);

@@ -30,6 +30,9 @@ app.UseStaticFiles();
 // The {0} placeholder in the specified path will be replaced with the actual status code.
 app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
+// Enable endpoint routing. from ApplicationServiceExtensions
+app.UseCors("CorsPolicy");
+
 app.UseAuthorization();
 
 app.MapControllers();

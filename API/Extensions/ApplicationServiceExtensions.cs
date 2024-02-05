@@ -40,6 +40,14 @@ public static class ApplicationServiceExtensions
                     Errors = errors
                 };
 
+            services.AddCors(opt =>{
+                opt.AddPolicy("CorsPolicy", policy =>
+                {
+                    policy.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("https://localhost:4200");
+                });
+            }
+            );
+
                 return new BadRequestObjectResult(errorResponse);
             };
         });
