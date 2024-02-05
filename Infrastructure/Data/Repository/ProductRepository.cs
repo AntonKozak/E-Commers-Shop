@@ -4,33 +4,34 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data.Repository;
 
-public class ProductRepository: IProductRepository
+public class ProductRepository : IProductRepository
 {
     private readonly StoreContext _context;
     public ProductRepository(StoreContext context)
     {
         _context = context;
     }
+
+    public async Task<Product> GetProductByIdAsync(int id)
+    {
+
+        var product = await _context.Products
+            .Include(p => p.ProductBrand)
+            .Include(p => p.ProductType)
+            .FirstOrDefaultAsync(p => p.Id == id);
+        return product;
+    }
     public async Task<IReadOnlyList<Product>> GetProductsListAsync()
     {
-        var typeId = 1;
+
         var products = await _context.Products
-            .Where(p => p.ProductTypeId == typeId)
             .Include(p => p.ProductType)
             .Include(p => p.ProductBrand)
             .ToListAsync();
 
         return products;
     }
-    public async Task<Product> GetProductByIdAsync(int id)
-    {
-        
-        var product =  await _context.Products
-            .Include(p => p.ProductBrand)
-            .Include(p => p.ProductType)
-            .FirstOrDefaultAsync(p => p.Id == id);
-        return product;
-    }
+
 
     public async Task<IReadOnlyList<ProductBrand>> GetProductBrandsAsync()
     {

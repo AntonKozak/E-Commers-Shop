@@ -16,7 +16,7 @@ public static class ApplicationServiceExtensions
         services.AddSwaggerGen();
         services.AddDbContext<StoreContext>(opt =>
         {
-            opt.UseSqlite(config.GetConnectionString("Data Source=skinet.db"));
+            opt.UseSqlite("Data Source=skinet.db");
         });
 
         services.AddScoped<IProductRepository, ProductRepository>();
