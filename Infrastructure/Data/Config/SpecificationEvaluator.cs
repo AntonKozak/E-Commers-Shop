@@ -21,7 +21,7 @@ public class SpecificationEvaluator<TEntity> where TEntity : BaseEntity
             query = query.Where(spec.Criteria);//where p => p.ProductTypeId == typeId
         }
 
-        // If a sorting order is specified in the specification,
+        // sorting 
         // apply the OrderBy clause to the query based on the provided lambda expression.
         if (spec.OrderBy != null)
         {
@@ -31,6 +31,12 @@ public class SpecificationEvaluator<TEntity> where TEntity : BaseEntity
         if (spec.OrderByDescending != null)
         {
             query = query.OrderByDescending(spec.OrderByDescending);
+        }
+
+        // ordering importent to be before skip and take
+        if (spec.IsPagingEnabled)
+        {
+            query = query.Skip(spec.Skip).Take(spec.Take);
         }
 
         // Apply includes if specified
