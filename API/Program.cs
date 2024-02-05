@@ -1,7 +1,9 @@
 
+using API.Middleware;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Data.Repository;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,7 +31,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Enable custom error handling by redirecting to the specified error page for non-success status codes.
+app.UseMiddleware<ExeptionMiddleware>();
+
 app.UseStaticFiles();
+
+// Enable custom error handling by redirecting to the specified error page for non-success status codes.
+// The {0} placeholder in the specified path will be replaced with the actual status code.
+app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
 app.UseAuthorization();
 
