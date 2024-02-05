@@ -1,26 +1,16 @@
-
+using API.Extensions;
 using API.Middleware;
-using Core.Interfaces;
 using Infrastructure.Data;
-using Infrastructure.Data.Repository;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<StoreContext>(opt => {
-    opt.UseSqlite("Data Source=skinet.db");
-});
 
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+// Add services to the container using the extension method.
+builder.Services.AddApplicationServices(builder.Configuration);
+
 
 var app = builder.Build();
 
