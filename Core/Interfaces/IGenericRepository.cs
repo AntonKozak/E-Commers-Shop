@@ -14,4 +14,7 @@ public interface IGenericRepository<T> where T : BaseEntity
     Task<T> GetEntityWithSpec(ISpecification<T> spec);
     //return list of entities based on the provided specification.(orderings, pagination, filtering ...)
     Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec);
+
+    //return the count of entities based on the provided specification.
+    Task<int> CountAsync(ISpecification<T> spec);
 }
