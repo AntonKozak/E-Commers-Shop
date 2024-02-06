@@ -11,7 +11,6 @@ builder.Services.AddControllers();
 // Add services to the container using the extension method.
 builder.Services.AddApplicationServices(builder.Configuration);
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
