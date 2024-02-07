@@ -14,7 +14,9 @@ export class ProductDetailsComponent implements OnInit{
   product?: Product;
   
   //ActivatedRoute to get product.id from routerlink
-  constructor(private shopService: ShopService, private activatedRoute: ActivatedRoute, private bcService: BreadcrumbService ){}
+  constructor(private shopService: ShopService, private activatedRoute: ActivatedRoute, private bcService: BreadcrumbService ){
+    this.bcService.set('@productDetails', ' ');
+  }
   
   ngOnInit(): void {
     this.loadProduct();
