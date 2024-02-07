@@ -10,3 +10,18 @@
     right: 25px;
     
 }
+
+a{
+    text-decoration: none;
+    color: #343a40;
+    &.active{
+        color: orange;
+    }
+}
+
+.logo{
+    width: 4rem;
+    height: 4rem;
+    margin-right: 10px;
+    border-radius: 40%;
+}

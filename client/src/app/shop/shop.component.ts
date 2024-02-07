@@ -1,4 +1,11 @@
-import { Component, ElementRef, OnInit, Output, ViewChild, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  Output,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { Product } from '../shared/models/products';
 import { ShopService } from './shop.service';
 import { Brand } from '../shared/models/brand';
@@ -16,14 +23,13 @@ export class ShopComponent implements OnInit {
   brands: Brand[] = [];
   types: Type[] = [];
   shopParams = new ShopParams();
+  totalCount = 0;
 
   sortOptions = [
-    {name: 'Alphabetical', value: 'name'},
-    {name: 'Price: Low to High', value: 'priceAsc'},
-    {name: 'Price: High to Low', value: 'priceDesc'},
+    { name: 'Alphabetical', value: 'name' },
+    { name: 'Price: Low to High', value: 'priceAsc' },
+    { name: 'Price: High to Low', value: 'priceDesc' },
   ];
-
-  totalCount = 0;
 
   private shopService = inject(ShopService);
 
@@ -36,7 +42,7 @@ export class ShopComponent implements OnInit {
   getProducts() {
     this.shopService.getProducts(this.shopParams).subscribe({
       next: (response) => {
-        this.products = response.data
+        this.products = response.data;
         this.shopParams.pageNumber = response.pageIndex;
         this.shopParams.pageSize = response.pageSize;
         this.totalCount = response.count;
@@ -48,14 +54,14 @@ export class ShopComponent implements OnInit {
   getBrands() {
     this.shopService.getBrands().subscribe({
       //{id: 0, name: 'All'}, ...response, ] is a way to add an 'All' option to the list of brands
-      next: (response) => (this.brands = [{id: 0, name: 'All'}, ...response, ]),
+      next: (response) => (this.brands = [{ id: 0, name: 'All' }, ...response]),
       error: (error) => console.log(error),
     });
   }
 
   getTypes() {
     this.shopService.getTypes().subscribe({
-      next: (response) => (this.types = [{id: 0, name: 'All'}, ...response, ]),
+      next: (response) => (this.types = [{ id: 0, name: 'All' }, ...response]),
       error: (error) => console.log(error),
     });
   }
@@ -90,11 +96,9 @@ export class ShopComponent implements OnInit {
     this.getProducts();
   }
 
-onReset() {
-  if (this.searchTerm)
-  this.searchTerm.nativeElement.value = '';
-  this.shopParams = new ShopParams();
-  this.getProducts();
-}
-
+  onReset() {
+    if (this.searchTerm) this.searchTerm.nativeElement.value = '';
+    this.shopParams = new ShopParams();
+    this.getProducts();
+  }
 }
