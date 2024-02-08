@@ -11,6 +11,7 @@ const routes: Routes = [
   {path: 'not-found', component: NotFoundComponent},
   {path: 'server-error', component: ServerErrorComponent},
   {path: 'shop', loadChildren: () => import('./shop/shop.module').then(mod => mod.ShopModule), data: {breadcrumb: 'Shop'}},//layzy loading => ShopRoutingModule
+  {path: 'basket', loadChildren: () => import('./basket/basket.module').then(mod => mod.BasketModule), data: {breadcrumb: 'Basket'}},
   {path: '**', redirectTo: '', pathMatch: 'full'},
 
 ];
