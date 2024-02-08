@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Infrastructure.Data.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 namespace API.Extensions;
 
@@ -17,6 +18,12 @@ public static class ApplicationServiceExtensions
         services.AddDbContext<StoreContext>(opt =>
         {
             opt.UseSqlite("Data Source=skinet.db");
+        });
+
+        services.AddSingleton<IConnectionMultiplexer>(c =>
+        {
+            var options = ConfigurationOptions.Parse(config.GetConnectionString("Redis"), true);
+            return ConnectionMultiplexer.Connect(options);
         });
 
         services.AddScoped<IProductRepository, ProductRepository>();
