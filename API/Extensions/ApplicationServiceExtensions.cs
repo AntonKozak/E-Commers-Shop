@@ -26,6 +26,7 @@ public static class ApplicationServiceExtensions
             return ConnectionMultiplexer.Connect(options);
         });
 
+        services.AddScoped<IBasketRepository, BasketRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
