@@ -1,7 +1,7 @@
 import { Injectable, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { Basket, BasketItem } from '../shared/models/basket';
+import { Basket, BasketItem, BasketTotals } from '../shared/models/basket';
 import { HttpClient } from '@angular/common/http';
 import { Product } from '../shared/models/products';
 
@@ -12,9 +12,12 @@ export class BasketService implements OnInit {
   baseURl = environment.apiUrl;
 
   private basketSource = new BehaviorSubject<Basket | null>(null);
-  basket$ = this.basketSource.asObservable();
+  basketSource$ = this.basketSource.asObservable();
 
-  constructor(private http: HttpClient) {}
+  private basketTotalSourse= new BehaviorSubject<BasketTotals | null>(null);
+  basketTotalSourse$ = this.basketTotalSourse.asObservable();
+
+  constructor(private http: HttpClient,) {}
 
   ngOnInit(): void {
     throw new Error('Method not implemented.');
@@ -24,6 +27,7 @@ export class BasketService implements OnInit {
     return this.http.get<Basket>(this.baseURl + 'basket?id=' + id).subscribe({
       next: (basket: Basket) => {
         this.basketSource.next(basket);
+        this.calculateTotals();
       },
       error: (error) => {
         console.log(error);
@@ -33,8 +37,9 @@ export class BasketService implements OnInit {
 
   setBasket(basket: Basket) {
     return this.http.post<Basket>(this.baseURl + 'basket', basket).subscribe({
-      next: (response: Basket) => {
+      next: response => {
         this.basketSource.next(response);
+        this.calculateTotals();
       },
       error: (error) => {
         console.log(error);
@@ -66,15 +71,43 @@ export class BasketService implements OnInit {
       return basket;
     }
     
-    addItemToBasket(item: Product, quantity = 1) {
-      const itemToAdd: BasketItem = this.mapProductItemToBasketItem(
-        item,
-        quantity
-      );
+    addItemToBasket(item: Product | BasketItem, quantity = 1) {
+      
+      if(this.isProduct(item)) item = this.mapProductItemToBasketItem(item, quantity);
       const basket = this.getCurrentBasketValue() ?? this.createBasket();
-      basket.items = this.addOrUpdateItem(basket.items, itemToAdd, quantity);
+      basket.items = this.addOrUpdateItem(basket.items, item, quantity);
       this.setBasket(basket);
     }
+
+    public  removeItemFromBasket(id: number, quantity =1) {
+        const basket = this.getCurrentBasketValue();
+        if(!basket) return;
+        const item = basket.items.find(i => i.id === id);
+        if(item){
+          item.quantity -= quantity;
+          if(item.quantity === 0){
+            basket.items = basket.items.filter(i => i.id !== id);
+          }
+          if(basket.items.length > 0){
+            this.setBasket(basket);
+        }else{
+          this.deleteBasket(basket);
+        }
+      }
+  }
+    private  deleteBasket(basket: Basket) {
+        return this.http.delete(this.baseURl + 'basket?id=' + basket.id).subscribe({
+          next: () => {
+            this.basketSource.next(null);
+            this.basketTotalSourse.next(null);
+            localStorage.removeItem('basket_id');
+          },
+          error: (error) => {
+            console.log(error);
+          },
+        });
+      }
+    
 
   private addOrUpdateItem(items: BasketItem[], itemToAdd: BasketItem, quantity: number): BasketItem[] {
     const item = items.find((i) => i.id === itemToAdd.id);
@@ -86,4 +119,18 @@ export class BasketService implements OnInit {
     }
     return items;
   }
+
+  private calculateTotals(){
+    const basket = this.getCurrentBasketValue();
+    if(!basket) return;
+    const shipping = 0;
+    const subtotal = basket?.items.reduce((previosValue, currentValue) => (currentValue.price * currentValue.quantity) + previosValue, 0) ?? 0;
+    const total = subtotal + shipping;
+    this.basketTotalSourse.next({shipping, total, subtotal});
+  }
+
+  private isProduct(item: Product | BasketItem): item is Product {
+    return (item as Product).productBrand !== undefined;
+  }
+
 }
