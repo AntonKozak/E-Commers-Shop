@@ -12,7 +12,7 @@ public class BuggyController : BaseApiController
         _context = context;
 
     }
-
+    
     [HttpGet("notfound")]
     public ActionResult GetNotFoundRequest()
     {

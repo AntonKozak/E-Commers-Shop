@@ -1,7 +1,10 @@
+using System.Text;
 using Core.Entities.Identity;
 using Infrastructure.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace API.Extensions;
 
@@ -22,9 +25,21 @@ public static class IdentityServiceExtensions
             .AddEntityFrameworkStores<AppIdentityDbContext>()// create tables for identity in the database
             .AddSignInManager<SignInManager<AppUser>>();// it allows users to authenticate and sign in to the application
 
-        services.AddAuthentication();
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Token:Key"])),
+                    ValidIssuer = config["Token:Issuer"],
+                    ValidateIssuer = true,
+                    ValidateAudience = false    
+                };
+            }
+        );
 
-        services.AddAuthentication();
+        services.AddAuthorization();
 
 
         return services;
