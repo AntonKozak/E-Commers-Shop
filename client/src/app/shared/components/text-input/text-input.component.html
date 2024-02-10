@@ -6,7 +6,10 @@
     class="form-control"
     [ngClass]='(control.touched) ? control.invalid ? "is-invalid" : "is-valid" : null'
     >
+    <div *ngIf="control.status == 'PENDING'" class="fa-solid fa-spinner loader"></div>
     <label for="floatingInput">{{label}}</label>
     <div *ngIf="control.errors?.['required']" class="invalid-feedback" >Please enter your {{label}}</div>
     <div *ngIf="control.errors?.['email']" class="invalid-feedback" >Inavalid email address</div>
+    <div *ngIf="control.errors?.['pattern']" class="invalid-feedback" >Password requirer at least 6 letters: one capital, one non albhabetic, and number in your password</div>
+    <div *ngIf="control.errors?.['emailExists']" class="invalid-feedback" >Email address is taken</div>
 </div>
