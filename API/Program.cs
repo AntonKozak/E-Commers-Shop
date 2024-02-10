@@ -14,15 +14,12 @@ builder.Services.AddControllers();
 // Add services to the container using the extension method.
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
+builder.Services.AddSwaggerDocumentation();
+
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
 // Enable custom error handling by redirecting to the specified error page for non-success status codes.
 app.UseMiddleware<ExeptionMiddleware>();
@@ -32,6 +29,8 @@ app.UseStaticFiles();
 // Enable custom error handling by redirecting to the specified error page for non-success status codes.
 // The {0} placeholder in the specified path will be replaced with the actual status code.
 app.UseStatusCodePagesWithReExecute("/errors/{0}");
+
+app.UseSwaggerDocumentation();
 
 // Enable endpoint routing. from ApplicationServiceExtensions
 app.UseCors("CorsPolicy");
