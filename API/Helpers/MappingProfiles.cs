@@ -17,6 +17,9 @@ public class MappingProfiles: Profile
             .ReverseMap();
         CreateMap<CustomerBasketDto, CustomerBasket>();
         CreateMap<BasketItemDto, BasketItem>();
+        //OrderDto is the input to the CreateOrder method in the OrdersController
+        CreateMap<AddressDto, Core.Entities.OrderAggregate.Address>();
+        
     }
 
     
