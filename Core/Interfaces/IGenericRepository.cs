@@ -17,4 +17,9 @@ public interface IGenericRepository<T> where T : BaseEntity
 
     //return the count of entities based on the provided specification.
     Task<int> CountAsync(ISpecification<T> spec);
+
+    //Truck it in memory 
+    void Add(T entity);
+    void Update(T entity);
+    void Delete(T entity);
 }

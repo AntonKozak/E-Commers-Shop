@@ -1,10 +1,10 @@
 using API.Dtos;
 using AutoMapper;
 using Core.Entities;
-using Microsoft.Extensions.Configuration;
 
 namespace API.Helpers;
-
+// going from product to productToReturnDto and return string of picture url
+// from this "images/products/boot-ang2.png" to this "https://localhost:5001/images/products/boot-ang2.png"
 public class ProductUrlResolver : IValueResolver<Product, ProductToReturnDto, string>
 {
     private readonly IConfiguration _config;
