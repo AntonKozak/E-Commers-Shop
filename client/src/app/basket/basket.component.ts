@@ -9,14 +9,15 @@ import { BasketItem } from '../shared/models/basket';
 })
 export class BasketComponent {
 
+
 public basketServise = inject(BasketService);
 
   incrementQuantity(item: BasketItem) {
     this.basketServise.addItemToBasket(item);
   }
 
-  removeItem(id: number, quantity: number) {
-    this.basketServise.removeItemFromBasket(id, quantity);
+  removeItem(event: {id: number, quantity: number}) {
+    this.basketServise.removeItemFromBasket(event.id, event.quantity);
   }
 
 }
