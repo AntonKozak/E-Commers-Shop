@@ -4,20 +4,25 @@ import { environment } from 'src/environments/environment';
 import { Basket, BasketItem, BasketTotals } from '../shared/models/basket';
 import { HttpClient } from '@angular/common/http';
 import { Product } from '../shared/models/products';
+import { DeliveryMethod } from '../shared/models/deliveryMethod';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BasketService implements OnInit {
   baseURl = environment.apiUrl;
-
   private basketSource = new BehaviorSubject<Basket | null>(null);
   basketSource$ = this.basketSource.asObservable();
-
   private basketTotalSourse= new BehaviorSubject<BasketTotals | null>(null);
   basketTotalSourse$ = this.basketTotalSourse.asObservable();
+  shipping = 0;
 
   constructor(private http: HttpClient,) {}
+
+  setShippingPrice(deliveryMethod: DeliveryMethod){
+    this.shipping = deliveryMethod.price;
+    this.calculateTotals();
+  }
 
   ngOnInit(): void {
     throw new Error('Method not implemented.');
@@ -123,10 +128,10 @@ export class BasketService implements OnInit {
   private calculateTotals(){
     const basket = this.getCurrentBasketValue();
     if(!basket) return;
-    const shipping = 0;
+    
     const subtotal = basket?.items.reduce((previosValue, currentValue) => (currentValue.price * currentValue.quantity) + previosValue, 0) ?? 0;
-    const total = subtotal + shipping;
-    this.basketTotalSourse.next({shipping, total, subtotal});
+    const total = subtotal + this.shipping;
+    this.basketTotalSourse.next({shipping: this.shipping, total, subtotal});
   }
 
   private isProduct(item: Product | BasketItem): item is Product {
