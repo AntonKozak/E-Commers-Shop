@@ -20,8 +20,12 @@ export class BasketService implements OnInit {
   constructor(private http: HttpClient,) {}
 
   setShippingPrice(deliveryMethod: DeliveryMethod){
+    const basket = this.getCurrentBasketValue();
     this.shipping = deliveryMethod.price;
-    this.calculateTotals();
+    if(basket){
+      basket.deliveryMethodId = deliveryMethod.id;
+      this.setBasket(basket);
+    }
   }
 
   ngOnInit(): void {
@@ -116,7 +120,6 @@ export class BasketService implements OnInit {
     this.basketTotalSourse.next(null);
     localStorage.removeItem('basket_id');
   }
-    
 
   private addOrUpdateItem(items: BasketItem[], itemToAdd: BasketItem, quantity: number): BasketItem[] {
     const item = items.find((i) => i.id === itemToAdd.id);
