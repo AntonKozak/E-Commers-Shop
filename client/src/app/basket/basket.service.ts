@@ -103,15 +103,19 @@ export class BasketService implements OnInit {
     private  deleteBasket(basket: Basket) {
         return this.http.delete(this.baseURl + 'basket?id=' + basket.id).subscribe({
           next: () => {
-            this.basketSource.next(null);
-            this.basketTotalSourse.next(null);
-            localStorage.removeItem('basket_id');
+            this.deleteLocalBasket();
           },
           error: (error) => {
             console.log(error);
           },
         });
       }
+
+  deleteLocalBasket() {
+    this.basketSource.next(null);
+    this.basketTotalSourse.next(null);
+    localStorage.removeItem('basket_id');
+  }
     
 
   private addOrUpdateItem(items: BasketItem[], itemToAdd: BasketItem, quantity: number): BasketItem[] {
