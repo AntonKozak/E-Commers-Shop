@@ -29,6 +29,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
