@@ -2,7 +2,12 @@
     <ul class="nav nav-pills nav-justified">
         <li class="nav-item" *ngFor='let step of steps; let i = index'>
             <div class="d-grid">
-                <button class='nav-link py-3 text-uppercase fw-bold' (click)="onClick(i)" [class.active]='selectedIndex === i'>{{step.label}}</button>
+                <button 
+                class='nav-link py-3 text-uppercase fw-bold' 
+                (click)="onClick(i)" 
+                [class.active]='selectedIndex === i'
+                [disabled]="true"
+                >{{step.label}}</button>
             </div>
         </li>
     </ul>

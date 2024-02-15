@@ -36,9 +36,10 @@
         <i class='fa fa-angle-left'></i>
         Back to review
     </button>
-    <button class="btn btn-outline-primary " (click)="submitOrder()">
+    <button [disabled]="loading || !paymentFormComplete" class="btn btn-outline-primary " (click)="submitOrder()">
         Submit order
         <i class='fa fa-angle-right'></i>
+        <i class='fa fa-spinner fa-spin' *ngIf="loading"></i>
     </button>
 
 </div>
