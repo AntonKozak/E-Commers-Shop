@@ -100,6 +100,8 @@ export class CheckoutPaymentComponent implements OnInit {
   async submitOrder() {
     this.loading = true;
     const basket = this.basketService.getCurrentBasketValue();
+    if (!basket) {throw new Error('Basket is null');}
+    
     try {
       const createdOrder = await this.createOrder(basket);
       // Confirm payment with Stripe
@@ -107,7 +109,7 @@ export class CheckoutPaymentComponent implements OnInit {
       // If payment successful, show success message and navigate to success page
       if (paymentResult.paymentIntent) {
         this.toastr.success('Payment successful');
-        this.basketService.deleteLocalBasket();
+        this.basketService.deleteBasket(basket);
         // sending the order object to the success page
         const navigationExtras: NavigationExtras = { state: createdOrder };
         this.router.navigate(['checkout/success'], navigationExtras);
