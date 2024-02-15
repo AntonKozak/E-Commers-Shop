@@ -13,6 +13,8 @@ import {
   StripeCardNumberElement,
   loadStripe,
 } from '@stripe/stripe-js';
+import { firstValueFrom } from 'rxjs';
+import { OrderToCreate } from 'src/app/shared/models/order';
 
 @Component({
   selector: 'app-checkout-payment',
@@ -20,8 +22,8 @@ import {
   styleUrls: ['./checkout-payment.component.scss'],
 })
 export class CheckoutPaymentComponent implements OnInit {
-  @Input() checkoutForm?: FormGroup;
-  @ViewChild('cardNumber') cardNumberElement?: ElementRef;
+  @Input() checkoutForm?: FormGroup; // Input property for receiving the checkout form
+  @ViewChild('cardNumber') cardNumberElement?: ElementRef; // Reference to the card number input element
   @ViewChild('cardExpiry') cardExpiryElement?: ElementRef;
   @ViewChild('cardCvc') cardCvcElement?: ElementRef;
   stripe: Stripe | null = null;
@@ -29,6 +31,7 @@ export class CheckoutPaymentComponent implements OnInit {
   cardExpiry?: StripeCardExpiryElement;
   cardCvc?: StripeCardCvcElement;
   cardErrors: any;
+  loading = false; // Flag to indicate loading state
 
   constructor(
     private basketService: BasketService,
@@ -39,12 +42,14 @@ export class CheckoutPaymentComponent implements OnInit {
 
   ngOnInit(): void {
     loadStripe(
+      // set up card elements
       'pk_test_51OjRIQDbmxdsBdf2A4CSb7iHNHMReht5nbgUQM6ucT1ZTZfVQJ5kRSIykfdaxklS1qeVrBQm3ZiwsevCQSZ7yH4f00sEquqkYl'
     ).then((stripe) => {
-      this.stripe = stripe;
-      const elements = stripe?.elements();
+      this.stripe = stripe; // Initialize stripe object
+      const elements = stripe?.elements(); // Get Stripe elements
 
       if (elements) {
+        // Create card number element
         this.cardNumber = elements.create('cardNumber');
         this.cardNumber.mount(this.cardNumberElement?.nativeElement);
         this.cardNumber.on('change', (event) => {
@@ -54,7 +59,7 @@ export class CheckoutPaymentComponent implements OnInit {
             this.cardErrors = null;
           }
         });
-
+        // Create card expiry element
         this.cardExpiry = elements.create('cardExpiry');
         this.cardExpiry.mount(this.cardExpiryElement?.nativeElement);
         this.cardExpiry.on('change', (event) => {
@@ -64,7 +69,7 @@ export class CheckoutPaymentComponent implements OnInit {
             this.cardErrors = null;
           }
         });
-
+        // Create card CVV element
         this.cardCvc = elements.create('cardCvc');
         this.cardCvc.mount(this.cardCvcElement?.nativeElement);
         this.cardCvc.on('change', (event) => {
@@ -78,54 +83,64 @@ export class CheckoutPaymentComponent implements OnInit {
     });
   }
 
-  submitOrder() {
+  async submitOrder() {
+    this.loading = true;
     const basket = this.basketService.getCurrentBasketValue();
-    if (!basket) return;
+    try {
+      const createdOrder = await this.createOrder(basket);
+      // Confirm payment with Stripe
+      const paymentResult = await this.confirmPaymentWithStripe(basket);
+      // If payment successful, show success message and navigate to success page
+      if (paymentResult.paymentIntent) {
+        this.toastr.success('Payment successful');
+        this.basketService.deleteLocalBasket();
+        // sending the order object to the success page
+        const navigationExtras: NavigationExtras = { state: createdOrder };
+        this.router.navigate(['checkout/success'], navigationExtras);
+      } else {
+        this.toastr.error(paymentResult.error.message);
+      }
+    } catch (error: any) {
+      console.log(error);
+      this.toastr.error(error.message);
+    } finally {
+      this.loading = false;
+    }
+  }
 
-    const orderToCreate = this.getOrderToCreate(basket);
-    if (!orderToCreate) return;
-    this.checkoutService.createOrder(orderToCreate).subscribe({
-      next: (order) => {
-        this.toastr.success('Order created successfully');
-        this.stripe
-          ?.confirmCardPayment(basket.clientSecret!, {
-            payment_method: {
-              card: this.cardNumber!,
-              billing_details: {
-                name: this.checkoutForm?.get('paymentForm')?.get('nameOnCard')?.value,
-              },
-            },
-          })
-          .then((result) => {
-            console.log(result);
-            if (result.error) {
-              this.toastr.error(result.error.message);
-            } else {
-              if (result.paymentIntent?.status === 'succeeded') {
-                this.toastr.success('Payment successful');
-                this.basketService.deleteLocalBasket();
-                // sending the order object to the success page
-                const navigationExtras: NavigationExtras = { state: order };
-                this.router.navigate(['checkout/success'], navigationExtras);
-              }
-            }
-          });
-      },
-      error: (error) => {
-        this.toastr.error(error.message);
+  private async confirmPaymentWithStripe(basket: Basket | null) {
+    if (!basket) throw new Error('Basket is null');
+
+    const result = await this.stripe?.confirmCardPayment(basket.clientSecret!, {
+      payment_method: {
+        card: this.cardNumber!,
+        billing_details: {
+          name: this.checkoutForm?.get('paymentForm')?.get('nameOnCard')?.value,
+        },
       },
     });
+    if (!result)
+      throw new Error('Payment result is null, Problem attempting with stripe');
+
+    return result;
+  }
+
+  private async createOrder(basket: Basket | null) {
+    if (!basket) throw new Error('Basket is null');
+    const orderToCreate = this.getOrderToCreate(basket);
+    return firstValueFrom(this.checkoutService.createOrder(orderToCreate));
   }
 
   //getting info from the form to create an order object
-  private getOrderToCreate(basket: Basket) {
+  private getOrderToCreate(basket: Basket): OrderToCreate {
     const deliveryMethodId = this.checkoutForm
       ?.get('deliveryForm')
       ?.get('deliveryMethod')?.value;
     const shipToAddress = this.checkoutForm?.get('addressForm')
       ?.value as Address;
 
-    if (!deliveryMethodId || !shipToAddress) return;
+    if (!deliveryMethodId || !shipToAddress)
+      throw new Error('Delivery method or address is missing');
 
     return {
       basketId: basket.id,

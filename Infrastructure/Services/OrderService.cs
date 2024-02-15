@@ -7,12 +7,12 @@ namespace Infrastructure.Services;
 
 public class OrderService : IOrderService
 {
-        private readonly IBasketRepository _basketRepo;
-        private readonly IUnitOfWork _unitOfWork;
+    private readonly IBasketRepository _basketRepo;
+    private readonly IUnitOfWork _unitOfWork;
     public OrderService(IBasketRepository basketRepo, IUnitOfWork unitOfWork)
     {
-            _unitOfWork = unitOfWork;
-            _basketRepo = basketRepo;
+        _unitOfWork = unitOfWork;
+        _basketRepo = basketRepo;
     }
 
     public async Task<Order> CreateOrderAsync(string buyerEmail, int deliveryMethodId, string basketId, Address shippingAddress)
@@ -25,25 +25,40 @@ public class OrderService : IOrderService
         {
             var productItem = await _unitOfWork.Repository<Product>().GetByIdAsync(item.Id);
             var itemOrdered = new ProductItemOrdered(productItem.Id, productItem.Name, productItem.PictureUrl);
-            var orderItem = new OrderItem(itemOrdered, productItem.Price, item.Quantity, item.ProductName );
+            var orderItem = new OrderItem(itemOrdered, productItem.Price, item.Quantity, item.ProductName);
             items.Add(orderItem);
         }
         //get delivery method from repo
         var deliveryMethod = await _unitOfWork.Repository<DeliveryMethod>().GetByIdAsync(deliveryMethodId);
+
         //calculate subtotal
         var subtotal = items.Sum(item => item.Price * item.Quantity);
-        //create order
-        var order = new Order(items, buyerEmail, shippingAddress, deliveryMethod, subtotal);
+
+        //adding this after the connection to stripe payment intent är set upp
+        //chech to see if order exists
+        var spec = new OrderByPaymentIntentIdSpecification(basket.PaymentIntentId);
+        var order = await _unitOfWork.Repository<Order>().GetEntityWithSpec(spec);
+
+        if (order != null)
+        {
+            //update order with new items
+            order.ShipToAddress = shippingAddress;
+            order.DeliveryMethod = deliveryMethod;
+            order.Subtotal = subtotal;
+            _unitOfWork.Repository<Order>().Update(order);
+        }else{
+            //create order
+        order = new Order(items, buyerEmail, shippingAddress, deliveryMethod, subtotal, basket.PaymentIntentId);
         //save to memory ! Not to db
         _unitOfWork.Repository<Order>().Add(order);
+        }
+
+        
         //Save to Db any changes that attract by EntityFramework gonna be saved to Db 
         var result = await _unitOfWork.Complete();
+        
         // If complete fails then all changes gonna be rolled back
         if (result <= 0) return null;
-
-        //delete basket
-        await _basketRepo.DeleteBasketAsync(basketId);
-
         //return order
         return order;
     }
