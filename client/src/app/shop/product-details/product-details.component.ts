@@ -23,6 +23,7 @@ export class ProductDetailsComponent implements OnInit{
     private bcService: BreadcrumbService,
     private basketService: BasketService
     ){
+      //Given label to the breadcrumb to show the name of the product in the section-header.component.html
     this.bcService.set('@productDetails', ' ');
   }
   

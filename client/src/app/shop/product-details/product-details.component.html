@@ -7,6 +7,7 @@
         <h2>{{product.name}}</h2>
         <p style='font-size: 2em;'>Price: {{product.price | currency}}</p>
         <h5 class='text-primary mb-3' *ngIf="quantityInBasket > 0">You have {{quantityInBasket}} of this item in your basket</h5>
+        
         <div class='d-flex justify-conten-start align-item-center'>
             <i 
             (click)="decrementQuantity()"
@@ -21,10 +22,12 @@
             ></i>
             <button (click)="updateBasket()" [disabled]='quantity === quantityInBasket' class="btn btn-primary ms-4">{{buttonText}}</button>
         </div>
+
         <div class="row mt-4">
             <h4>Description</h4>
             <p>{{product.description}}</p>
         </div>
+
     </div>
 </div>
 </div>
