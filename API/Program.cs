@@ -3,8 +3,10 @@ using API.Middleware;
 using Core.Entities.Identity;
 using Infrastructure.Data;
 using Infrastructure.Identity;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,8 +25,15 @@ var app = builder.Build();
 
 // Enable custom error handling by redirecting to the specified error page for non-success status codes.
 app.UseMiddleware<ExeptionMiddleware>();
-
+//take care off wwwroot folder
 app.UseStaticFiles();
+//take care to get static images from Content/Images folder
+//and update "ApiUrl": "https://localhost:5001/Content/" in appsettings.Development.json
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Content")),
+    RequestPath = "/content"
+});
 
 // Enable custom error handling by redirecting to the specified error page for non-success status codes.
 // The {0} placeholder in the specified path will be replaced with the actual status code.
@@ -39,6 +48,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapFallbackToController("Index", "Fallback");
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
