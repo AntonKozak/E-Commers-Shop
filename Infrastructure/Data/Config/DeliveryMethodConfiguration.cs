@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Entities.OrderAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -14,5 +10,6 @@ public class DeliveryMethodConfiguration : IEntityTypeConfiguration<DeliveryMeth
     {
         builder.Property(d => d.Price)
             .HasColumnType("decimal(18,2)");
+        
     }
 }

@@ -1,7 +1,3 @@
-
-
-using System.Drawing.Text;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Core.Interfaces;
 using StackExchange.Redis;
@@ -11,7 +7,6 @@ namespace Infrastructure.Services;
 public class ResponceCacheService : IResponseCacheService
 {
     private readonly IDatabase _database;
-    private readonly IConnectionMultiplexer _redis;
     public ResponceCacheService(IConnectionMultiplexer redis)
     {
         _database = redis.GetDatabase();

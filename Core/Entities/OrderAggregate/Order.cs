@@ -14,10 +14,11 @@ public class Order: BaseEntity
         OrderItems = orderItems;
         Subtotal = subtotal;
         PaymentIntentId = paymentIntentId;
+        OrderDate = DateTime.UtcNow;
     }
 
     public string BuyerEmail { get; set; }
-    public DateTime OrderDate { get; set; } = DateTime.Now;
+    public DateTime OrderDate { get; set; }
     public Address ShipToAddress { get; set; }
     public DeliveryMethod DeliveryMethod { get; set; }
     public IReadOnlyList<OrderItem> OrderItems { get; set; }

@@ -13,10 +13,9 @@ public static class ApplicationServiceExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
     {
-        services.AddDbContext<StoreContext>(opt =>
-        {
-            opt.UseSqlite("Data Source=skinet.db");
-        });
+        services.AddDbContext<StoreContext>(opt =>{
+            opt.UseNpgsql(config.GetConnectionString("DefaultConnection"));
+            });
 
         services.AddSingleton<IConnectionMultiplexer>(c =>
         {
