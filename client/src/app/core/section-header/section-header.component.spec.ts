@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SectionHeaderComponent } from './section-header.component';
+import { AppModule } from 'src/app/app.module';
 
 describe('SectionHeaderComponent', () => {
   let component: SectionHeaderComponent;
@@ -8,7 +9,8 @@ describe('SectionHeaderComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [SectionHeaderComponent]
+      declarations: [SectionHeaderComponent],
+      imports: [AppModule]
     });
     fixture = TestBed.createComponent(SectionHeaderComponent);
     component = fixture.componentInstance;
